@@ -1,4 +1,3 @@
-import { GetFilterDTO } from './dto/get-filter-task.dto';
 import {
   Body,
   Controller,
@@ -9,11 +8,12 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { GetFilterDTO } from './dto/get-filter-task.dto';
 
-import { Task, TaskStatus } from './tasks.model';
-import { TasksService } from './tasks.service';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { UpdateTaskStatusDTO } from './dto/update-task- status.dto';
+import { Task } from './tasks.model';
+import { TasksService } from './tasks.service';
 
 @Controller('tasks')
 export class TasksController {
