@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { TaskRepository } from './tasks.repository';
 import { Task } from './task.entity';
+import { TaskStatus } from './tasks-status.enum';
+import { GetFilterDTO } from './dto/get-filter-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -12,44 +14,32 @@ export class TasksService {
     private taskRepository: TaskRepository,
   ) {}
 
-  // getAllTasks(): Task[] {
-  //   return this.tasks;
-  // }
+  getTasks(filterDTO: GetFilterDTO): Promise<Task[]> {
+    return this.taskRepository.getTasks(filterDTO);
+  }
   async getTaskById(id: string): Promise<Task> {
-    const found = this.taskRepository.findOne({
-      where: {
-        id,
-      },
-    });
-    if (!found) {
-      throw new NotFoundException(`This task ${id} is not found `);
-    }
-    return found;
+    return this.taskRepository.getTaskById(id);
   }
 
   createTask(createTaskDto: CreateTaskDTO): Promise<Task> {
     return this.taskRepository.createTask(createTaskDto);
   }
-  // createTask(createTaskDTO: CreateTaskDTO): Task {
-  //   const { title, description } = createTaskDTO;
-  //   const task: Task = {
-  //     id: uuid(),
-  //     title,
-  //     description,
-  //     status: TaskStatus.OPEN,
-  //   };
-  //   this.tasks.push(task);
-  //   return task;
-  // }
-  // deleteTaskById(id: string): void {
-  //   const found = this.getTaskById(id);
-  //   this.tasks = this.tasks.filter((task) => task.id !== found.id);
-  // }
-  // updateTaskStatus(id: string, status: TaskStatus) {
-  //   const task = this.getTaskById(id);
-  //   task.status = status;
-  //   return task;
-  // }
+
+  async deleteTaskById(id: string): Promise<void> {
+    const result = await this.taskRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with Id : "${id}" was not found`);
+    }
+  }
+
+  async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
+    const task = await this.getTaskById(id);
+    task.status = status;
+
+    this.taskRepository.save(task);
+    return task;
+  }
   // getTasksWithFilters(filterDTO: GetFilterDTO): Task[] {
   //   const { search, status } = filterDTO;
   //   let tasks = this.getAllTasks();
