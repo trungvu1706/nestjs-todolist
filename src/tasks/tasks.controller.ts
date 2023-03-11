@@ -1,6 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CreateTaskDTO } from './dto/create-task.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 
+import { CreateTaskDTO } from './dto/create-task.dto';
+import { UpdateTaskStatusDTO } from './dto/update-task- status.dto';
+import { GetFilterDTO } from './dto/get-filter-task.dto';
 import { Task } from './task.entity';
 import { TasksService } from './tasks.service';
 
@@ -8,14 +19,10 @@ import { TasksService } from './tasks.service';
 export class TasksController {
   constructor(private taskService: TasksService) {}
 
-  // @Get()
-  // getTasks(@Query() filterDTO: GetFilterDTO): Task[] {
-  //   if (Object.keys(filterDTO).length) {
-  //     return this.tasksService.getTasksWithFilters(filterDTO);
-  //   } else {
-  //     return this.tasksService.getAllTasks();
-  //   }
-  // }
+  @Get()
+  getTasks(@Query() filterDTO: GetFilterDTO): Promise<Task[]> {
+    return this.taskService.getTasks(filterDTO);
+  }
 
   @Get('/:id')
   getTaskById(@Param('id') id: string): Promise<Task> {
@@ -27,17 +34,17 @@ export class TasksController {
     return this.taskService.createTask(createTaskDTO);
   }
 
-  // @Delete('/:id')
-  // deleteTaskById(@Param('id') id: string): void {
-  //   return this.tasksService.deleteTaskById(id);
-  // }
+  @Delete('/:id')
+  deleteTaskById(@Param('id') id: string): Promise<void> {
+    return this.taskService.deleteTaskById(id);
+  }
 
-  // @Patch('/:id/status')
-  // upDateTaskStatus(
-  //   @Param('id') id: string,
-  //   @Body() updateTaskStatusDTO: UpdateTaskStatusDTO,
-  // ): Task {
-  //   const { status } = updateTaskStatusDTO;
-  //   return this.tasksService.updateTaskStatus(id, status);
-  // }
+  @Patch('/:id/status')
+  upDateTaskStatus(
+    @Param('id') id: string,
+    @Body() updateTaskStatusDTO: UpdateTaskStatusDTO,
+  ): Promise<Task> {
+    const { status } = updateTaskStatusDTO;
+    return this.taskService.updateTaskStatus(id, status);
+  }
 }
